@@ -225,7 +225,6 @@
     "@typescript-eslint/utils": "catalog:peer",
     "chokidar": "catalog:dev",
     "eslint": "catalog:peer",
-    "prettier": "catalog:dev",
     "semver": "catalog:dev",
     "synckit": "catalog:dev",
     "tsx": "catalog:dev"
