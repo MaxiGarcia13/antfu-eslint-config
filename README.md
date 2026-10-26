@@ -580,7 +580,10 @@ export default antfu()
     'antfu/stylistic/rules',
     {
       rules: {
-        'style/generator-star-spacing': ['error', { after: true, before: false }],
+        'style/generator-star-spacing': [
+          'error',
+          { after: true, before: false }
+        ],
       }
     }
   )
@@ -900,6 +903,35 @@ async function foo(msg: string): void {
 
 The command comments are usually one-off and will be removed along with the transformation.
 
+### Different Project Types in a Monorepo
+
+`type` is an option for the `antfu()` factory, rather than a property of an ESLint
+flat config or a composer override. To share an application config with library
+packages, keep `type: 'app'` and add a file-scoped rule override for the libraries:
+
+```js
+// eslint.config.js
+import antfu from '@antfu/eslint-config'
+
+export default antfu(
+  { type: 'app' },
+  {
+    files: ['packages/libs/**/*.?([cm])ts', 'packages/libs/**/*.?([cm])tsx'],
+    rules: {
+      'ts/explicit-function-return-type': ['error', {
+        allowExpressions: true,
+        allowHigherOrderFunctions: true,
+        allowIIFEs: true,
+      }],
+    },
+  },
+)
+```
+
+This requires explicit function return types in the selected library files while
+preserving the application behavior elsewhere. Adjust the library paths to match
+your workspace.
+
 ### Type Aware Rules
 
 You can optionally enable the [type aware rules](https://typescript-eslint.io/linting/typed-linting/) by passing the options object to the `typescript` config:
@@ -911,6 +943,25 @@ import antfu from '@antfu/eslint-config'
 export default antfu({
   typescript: {
     tsconfigPath: 'tsconfig.json',
+  },
+})
+```
+
+Type aware rules apply to TypeScript and TSX files by default, using
+`['**/*.?([cm])ts', '**/*.?([cm])tsx']`. Vue files are excluded by default because
+type aware linting can substantially increase lint time. To opt in for Vue files,
+enable Vue support and include them in `filesTypeAware` while retaining the
+TypeScript and TSX patterns:
+
+```js
+// eslint.config.js
+import antfu from '@antfu/eslint-config'
+
+export default antfu({
+  vue: true,
+  typescript: {
+    tsconfigPath: 'tsconfig.json',
+    filesTypeAware: ['**/*.?([cm])ts', '**/*.?([cm])tsx', '**/*.vue'],
   },
 })
 ```
